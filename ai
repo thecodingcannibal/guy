@@ -1,0 +1,53 @@
+from nltk.chat.util import Chat, reflections
+from flask import Flask, render_template, request
+from PIL import Image
+
+app = Flask(__name__)
+
+pairs = [
+    [
+        r"my name is (.*)",
+        ["Hello %1, how can I help you today?",]
+    ],
+    [
+        r"(.*) help",
+        ["I can help you with programming, what do you need assistance with?",]
+    ],
+    [
+        r"quit",
+        ["Bye, take care!"]
+    ],
+]
+
+chat = Chat(pairs, reflections)
+
+@app.route("/", methods=["GET", "POST"])
+def chatbot():
+    if request.method == "POST":
+        user_input = request.form["user_input"]
+        response = chat.respond(user_input)
+
+        return render_template("index.html", response=response)
+
+    return render_template("index.html")
+
+if __name__ == "__main__":
+    app.run(debug=True)
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chatbot with Image</title>
+</head>
+<body>
+    <h1>Chatbot</h1>
+    <div>
+        <form method="post">
+            <input type="text" name="user_input">
+            <input type="submit" value="Send">
+        </form>
+    </div>
+    <div>
+        <p>{{ response }}</p>
+    </div>
+</body>
+</html>
